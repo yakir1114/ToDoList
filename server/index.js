@@ -10,6 +10,8 @@ const socketIO = require('socket.io')(http, {
     }
 });
 
+let todoList = [];
+
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -18,19 +20,30 @@ app.use(express.json());
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
 
-    socket.on('disconnect', () => {
-      socket.disconnect()
-      console.log('🔥: A user disconnected');
+    socket.on('addTodo', (todo) => {
+        console.log(todo);
+        todoList.unshift(todo);
+        socket.emit("todos", todoList);
     });
+
+    socket.on('deleteToDo', (id) => {
+        // todoList = todoList.filter((todo) => todo.id !== id)
+        todoList = todoList.filter((todo) => todo.id !== id);
+        socket.emit("todos", todoList);
+    });
+
+    socket.on('disconnect', () => {
+        socket.disconnect()
+        console.log('🔥: A user disconnected');
+    });
+
 });
 
 
 app.get("/api", (req, res) => {
-    res.json({
-        message: "Hello world!",
-    });
+    res.json(todoList);
 });
 
-app.listen(PORT, () => {
+http.listen(PORT, () => {
     console.log(`server listening on ${PORT} ...`);
 });
