@@ -11,6 +11,7 @@ const socketIO = require('socket.io')(http, {
 });
 
 let todoList = [];
+let usersList = [];
 
 
 app.use(cors());
@@ -32,6 +33,11 @@ socketIO.on('connection', (socket) => {
         socket.emit("todos", todoList);
     });
 
+    socket.on('addNewUser', (userName) =>{
+        usersList.push(userName);
+        socket.emit('users', usersList);
+    });
+
     socket.on('disconnect', () => {
         socket.disconnect()
         console.log('🔥: A user disconnected');
@@ -42,6 +48,9 @@ socketIO.on('connection', (socket) => {
 
 app.get("/api", (req, res) => {
     res.json(todoList);
+});
+app.get("/users", (req, res) => {
+    res.json(usersList);
 });
 
 http.listen(PORT, () => {

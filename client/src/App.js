@@ -10,7 +10,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Home />} />
+        <Route path='/' element={<Home socket={socket}/>} />
         <Route path='/app' element={<Main socket={socket} />} />
       </Routes>
     </BrowserRouter>

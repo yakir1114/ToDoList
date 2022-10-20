@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Home = () => {
-    //create username variable 
+const Home = (socket) => {
+    //create username & usernameList variables
     const [username, setUsername] = useState("");
+    const [usernameList, setUsernameList] = useState([]);
     // create navigation throw the components
     const navigate = useNavigate();
     //handler for submiting the form
@@ -15,6 +16,19 @@ const Home = () => {
         // then navigate to app(Main component)
         navigate("/app");
     }
+
+    useEffect(() => {
+        function fetchUsers() {
+            fetch("http://localhost:4000/users")
+                .then((res) => res.json())
+                .then((data) => setUsernameList(data))
+                .catch((err) => console.error(err));
+        }
+        fetchUsers();
+        // socket.on("users", (data) => {setUsernameList(data); console.log(data)});
+    }, [socket]);
+
+
 
     // making a Sign in form - for new users
     return (
