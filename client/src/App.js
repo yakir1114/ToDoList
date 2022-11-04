@@ -2,7 +2,7 @@ import './App.css';
 import React from "react";
 import socketIO from "socket.io-client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Main, Home }  from "./components/exports";
+import { Main, Home }  from "./components/Exports";
 
 const socket = socketIO.connect("http://localhost:4000");
 

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Nav } from "./exports";
+import { Nav, Modal } from "./Exports";
 
 const Main = ({ socket }) => {
 
     const [todo, setTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
-    const generateID = () => Math.random().toString(36).substring(2, 10);
+    const [showModal, setshowModal] = useState(false);
+    const [selectedItemID, setSelectedItemID] = useState("");
 
-    const deleteToDoTask = (id) => {
-        socket.emit("deleteToDo", id);
+    const generateID = () => Math.random().toString(36).substring(2, 10);
+    const toggelModal = (todoId) => {
+        socket.emit("viewComments", todoId);
+        setSelectedItemID(todoId);
+        setshowModal(!showModal);
     }
+    const deleteToDoTask = (id) => { socket.emit("deleteToDo", id); }
 
     const handleAddTodo = (e) => {
         e.preventDefault();
@@ -29,7 +34,7 @@ const Main = ({ socket }) => {
                 .catch((err) => console.error(err));
         }
         fetchTodos();
-        socket.on("todos", (data) => {setTodoList(data); console.log(data)});
+        socket.on("todos", (data) => { setTodoList(data); console.log(data) });
     }, [socket]);
 
     return (
@@ -49,12 +54,17 @@ const Main = ({ socket }) => {
                     <div className='todo__item' key={item.id}>
                         <p>{item.todo}</p>
                         <div>
-                            <button className='commentsBtn'>View Comments</button>
+                            <button className='commentsBtn' onClick={() => toggelModal(item.id)}>View Comments</button>
                             <button className='deleteBtn' onClick={() => deleteToDoTask(item.id)}>DELETE</button>
                         </div>
                     </div>
                 ))}
             </div>
+            {showModal ?
+                (<Modal socket={socket} showModal={showModal} setshowModal={setshowModal} selectedItemID={selectedItemID} setSelectedItemID={setSelectedItemID} />)
+                :
+                ("")
+            }
         </div>
     )
 }

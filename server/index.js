@@ -33,10 +33,27 @@ socketIO.on('connection', (socket) => {
         socket.emit("todos", todoList);
     });
 
-    socket.on('addNewUser', (userName) =>{
+    socket.on('addNewUser', (userName) => {
         usersList.push(userName);
         socket.emit('users', usersList);
     });
+
+    socket.on('viewComments', (commentId) => {
+        for (const todo of todoList) {
+            if (todo.id === commentId)
+                socket.emit("commentReceived", todo);
+        }
+    })
+
+    socket.on('updateComment', (data) => {
+        const { user, todoId, comment } = data;
+        for(const todo of todoList){
+            if(todo.id === todoId ){
+                todo.comments.push({name: user, text: comment})
+                socket.emit("commentReceived", todo);
+            }
+        }
+    })
 
     socket.on('disconnect', () => {
         socket.disconnect()
@@ -44,7 +61,6 @@ socketIO.on('connection', (socket) => {
     });
 
 });
-
 
 app.get("/api", (req, res) => {
     res.json(todoList);
